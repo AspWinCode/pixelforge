@@ -1,0 +1,211 @@
+:root {
+  /* Цвет: ночная мастерская, а не дефолтный крем/чёрный+один акцент */
+  --bg: #14151F;
+  --surface: #1D2030;
+  --surface-2: #262A3D;
+  --border: #33374A;
+
+  --ember: #FF6B35;      /* основной акцент: токены, primary-кнопки */
+  --ember-dim: #C9532A;
+  --cyan: #4ECDC4;       /* интерактив: ссылки, PUBLISHED */
+  --success: #6FCF97;    /* REVIEWED, успешные состояния */
+  --danger: #FF5C7A;     /* ошибки, 409/500 */
+
+  --text: #F2E9DC;
+  --text-muted: #8B8798;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius: 3px; /* почти без скругления — блочный, не "мягкий" стиль */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+button:hover:not(:disabled) {
+  border-color: var(--cyan);
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+button:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* Основная кнопка действия (Сдать, Создать, Опубликовать) — залита ember */
+button.primary {
+  background: var(--ember);
+  border-color: var(--ember);
+  color: #14151F;
+}
+button.primary:hover:not(:disabled) {
+  background: var(--ember-dim);
+  border-color: var(--ember-dim);
+}
+
+input {
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  margin-right: 8px;
+}
+input:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 1px;
+}
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+/* Сигнатурный элемент: LED-чип статуса — моноширинный, почти без
+   скругления, с точкой-индикатором. Цвет точки несёт смысл статуса. */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.status-chip::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-draft { color: var(--text-muted); }
+.status-published,
+.status-in_progress { color: var(--cyan); }
+.status-submitted { color: var(--ember); }
+.status-reviewed { color: var(--success); }
+
+/* Аркадный счётчик токенов — моноширинные цифры, лёгкое свечение */
+.token-counter {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ember);
+  text-shadow: 0 0 12px rgba(255, 107, 53, 0.4);
+  font-variant-numeric: tabular-nums;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 10px;
+}
+
+/* Левая цветная полоса по статусу — задаётся модификатором на самой карточке */
+.card-list-item {
+  border-left: 3px solid var(--border);
+}
+.card-list-item.status-published { border-left-color: var(--cyan); }
+.card-list-item.status-draft { border-left-color: var(--text-muted); }
+
+.message-banner {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.message-banner.error {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+.wordmark .accent { color: var(--ember); }
+
+html, #root {
+  min-height: 100%;
+  background: var(--bg);
+}
+
+html {
+  height: 100%;
+}
+
+/* Анимации для экрана "Путь" — пульсация текущего доступного узла
+   и лёгкое появление при загрузке, чтобы страница не была статичной. */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(78, 205, 196, 0); }
+}
+
+@keyframes node-appear {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.path-node-current {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.path-node-enter {
+  animation: node-appear 0.4s ease-out backwards;
+}

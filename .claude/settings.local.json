@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw -q -o compile)",
+      "Bash(for i *)",
+      "Bash(kill -9 1387527)",
+      "Bash(time curl -s -o /dev/null -w \"http_code=%{http_code} time=%{time_total}\\\\n\" -X POST \"http://localhost:8080/api/assignments/1/submissions/save?userId=1\" -H \"Content-Type: application/json\" -d '{\"xml\":\"<project></project>\"}' --max-time 15)",
+      "Read(//tmp/**)",
+      "Bash(xargs -I{} basename {})",
+      "Bash(javap -p -c /tmp/ac/software/amazon/awssdk/http/apache/internal/impl/ApacheHttpRequestFactory.class)",
+      "Bash(time curl -s -w \"\\\\nhttp_code=%{http_code} time=%{time_total}\\\\n\" -X POST \"http://localhost:8080/api/assignments/1/submissions/submit?userId=1\" --max-time 10)",
+      "Bash(curl -s \"http://localhost:8080/api/assignments/1/submissions/project?userId=1\")",
+      "Bash(curl -s -o /dev/null -w \"frontend http_code=%{http_code}\\\\n\" http://localhost:5173/ --max-time 3)"
+    ]
+  }
+}

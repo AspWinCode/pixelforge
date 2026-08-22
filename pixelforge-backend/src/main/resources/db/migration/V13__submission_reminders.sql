@@ -1,0 +1,3 @@
+ALTER TABLE users ADD COLUMN activity_count INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE submissions ADD COLUMN start_activity_count INTEGER;
+ALTER TABLE submissions ADD COLUMN reminded BOOLEAN NOT NULL DEFAULT false;

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><title>Snap! API test</title></head>
+  <meta charset="UTF-8">
+<body>
+  <button onclick="requestXML()">Получить XML проекта</button>
+  <pre id="output"></pre>
+  <iframe id="snapFrame" src="http://localhost:8000/snap.html" width="1000" height="600"></iframe>
+
+  <script>
+    function requestXML() {
+      document.getElementById('snapFrame').contentWindow.postMessage(
+        { selector: 'getProjectXML', params: [] },
+        '*'
+      );
+    }
+
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.selector === 'getProjectXML') {
+        document.getElementById('output').textContent =
+          'Получено XML длиной: ' + e.data.response.length + ' символов';
+      }
+    });
+  </script>
+</body>
+</html>

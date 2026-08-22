@@ -1,0 +1,1 @@
+ALTER TABLE pet_states ADD COLUMN name VARCHAR(32);
