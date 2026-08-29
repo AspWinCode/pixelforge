@@ -39,7 +39,7 @@ export function TrainerPage() {
   if (classes.length === 0) {
     return (
       <div className="page">
-        <h1>Кабинет тренера</h1>
+        <h1>Мастерская тренера</h1>
         <div className="message-banner">У вас пока нет ни одного класса.</div>
       </div>
     );
@@ -48,7 +48,7 @@ export function TrainerPage() {
   return (
     <div className="page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
-        <h1 style={{ marginBottom: 0 }}>Кабинет тренера</h1>
+        <h1 style={{ marginBottom: 0 }}>Мастерская тренера</h1>
         <span className="status-chip">{classes.find((c) => c.id === selectedClassId)?.name}</span>
       </div>
 

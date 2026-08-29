@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { NpcMessage } from '../api/npc';
+import ceoAvatar from '../assets/npc/ceo.png';
+import mentorAvatar from '../assets/npc/mentor.png';
+import artDirectorAvatar from '../assets/npc/art_director.png';
 
-const CHARACTER_INFO: Record<string, { emoji: string; name: string; color: string }> = {
-  MENTOR: { emoji: '🧑‍🏫', name: 'МЕНТОР', color: 'var(--cyan)' },
-  CEO: { emoji: '💼', name: 'CEO', color: 'var(--ember)' },
-  ART_DIRECTOR: { emoji: '🎨', name: 'АРТ-ДИРЕКТОР', color: 'var(--success)' },
+const CHARACTER_INFO: Record<string, { avatar: string; emoji: string; name: string; color: string }> = {
+  MENTOR: { avatar: mentorAvatar, emoji: '🧑‍🏫', name: 'МЕНТОР', color: 'var(--cyan)' },
+  CEO: { avatar: ceoAvatar, emoji: '💼', name: 'CEO', color: 'var(--ember)' },
+  ART_DIRECTOR: { avatar: artDirectorAvatar, emoji: '🎨', name: 'АРТ-ДИРЕКТОР', color: 'var(--success)' },
 };
 
 const TYPE_SPEED_MS = 25;
@@ -24,7 +27,7 @@ export function NpcPopup({
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
 
-  const info = CHARACTER_INFO[message.character] ?? { emoji: '🤖', name: 'NPC', color: 'var(--text-muted)' };
+  const info = CHARACTER_INFO[message.character] ?? { avatar: undefined, emoji: '🤖', name: 'NPC', color: 'var(--text-muted)' };
 
   useEffect(() => {
     setDisplayedText('');
@@ -66,9 +69,9 @@ export function NpcPopup({
         style={{
           display: 'flex',
           background: 'var(--surface)',
-          border: `2px solid ${info.color}`,
-          borderRadius: 'var(--radius)',
-          boxShadow: `0 12px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.02)`,
+          border: `3px solid ${info.color}`,
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: `0 12px 32px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255,255,255,0.4)`,
           overflow: 'hidden',
           cursor: isTyping ? 'pointer' : 'default',
         }}
@@ -88,15 +91,29 @@ export function NpcPopup({
             padding: '10px 4px',
           }}
         >
-          <div
-            style={{
-              fontSize: '34px',
-              animation: isTyping ? 'pulse-glow 1.1s ease-in-out infinite' : 'none',
-              filter: isTyping ? `drop-shadow(0 0 6px ${info.color})` : 'none',
-            }}
-          >
-            {info.emoji}
-          </div>
+          {info.avatar ? (
+            <img
+              src={info.avatar}
+              alt={info.name}
+              style={{
+                width: '58px',
+                height: 'auto',
+                imageRendering: 'pixelated',
+                animation: isTyping ? 'pulse-glow 1.1s ease-in-out infinite' : 'none',
+                filter: isTyping ? `drop-shadow(0 0 6px ${info.color})` : 'none',
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                fontSize: '34px',
+                animation: isTyping ? 'pulse-glow 1.1s ease-in-out infinite' : 'none',
+                filter: isTyping ? `drop-shadow(0 0 6px ${info.color})` : 'none',
+              }}
+            >
+              {info.emoji}
+            </div>
+          )}
         </div>
 
         <div style={{ flex: 1, padding: '12px 16px', display: 'flex', flexDirection: 'column' }}>
@@ -109,10 +126,10 @@ export function NpcPopup({
               fontSize: '11px',
               fontWeight: 700,
               letterSpacing: '0.08em',
-              color: '#14151F',
+              color: 'var(--on-accent)',
               background: info.color,
-              padding: '2px 8px',
-              borderRadius: '2px',
+              padding: '3px 9px',
+              borderRadius: '999px',
               marginBottom: '8px',
             }}
           >

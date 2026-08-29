@@ -1,24 +1,37 @@
 :root {
-  /* Цвет: ночная мастерская, а не дефолтный крем/чёрный+один акцент */
-  --bg: #14151F;
-  --surface: #1D2030;
-  --surface-2: #262A3D;
-  --border: #33374A;
+  /* Светлая студийная палитра — светло-серый фон, белые карточки,
+     синий как основной бренд-акцент (вместо прежней тёмной "мастерской"). */
+  --bg: #ECEEF3;
+  --surface: #FFFFFF;
+  --surface-2: #F2F3F8;
+  --border: #D6DAE5;
 
-  --ember: #FF6B35;      /* основной акцент: токены, primary-кнопки */
-  --ember-dim: #C9532A;
-  --cyan: #4ECDC4;       /* интерактив: ссылки, PUBLISHED */
-  --success: #6FCF97;    /* REVIEWED, успешные состояния */
-  --danger: #FF5C7A;     /* ошибки, 409/500 */
+  --ember: #3D6EFF;      /* основной акцент бренда: токены, primary-кнопки */
+  --ember-dim: #2C55D6;
+  --cyan: #0EA5B7;       /* интерактив: ссылки, PUBLISHED */
+  --success: #1FAF6B;    /* REVIEWED, успешные состояния */
+  --danger: #E23A5A;     /* ошибки, 409/500 */
 
-  --text: #F2E9DC;
-  --text-muted: #8B8798;
+  --text: #171923;
+  --text-muted: #6E7386;
+
+  /* Цвет текста поверх заливки акцентным цветом (primary-кнопки, цветные
+     бейджи-плашки) — всегда светлый, независимо от темы. */
+  --on-accent: #FFFFFF;
 
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Pixelify Sans — сглаженный пиксельный шрифт с поддержкой кириллицы.
+     Используется на всём игровом UI-обвесе (лого, навигация, кнопки,
+     чипы, HUD-счётчики), а не на основном тексте — так пиксельный вайб
+     не мешает читать длинные абзацы. */
+  --font-mono: 'Pixelify Sans', ui-monospace, monospace;
 
-  --radius: 3px; /* почти без скругления — блочный, не "мягкий" стиль */
+  --radius: 14px;        /* умеренное скругление: изображения, списки, баннеры */
+  --radius-lg: 22px;     /* карточки и диалоговые панели — крупное скругление */
+  --radius-pill: 999px;  /* кнопки, поля ввода, чипы — полная капсула */
+
+  --grid-line: rgba(23, 25, 35, 0.045);
 }
 
 * {
@@ -27,10 +40,18 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 28px 28px,
+    var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--ember);
+  color: var(--on-accent);
 }
 
 h1, h2, h3 {
@@ -48,20 +69,30 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Игровая "клавиша": плоская цветная грань снизу вместо тени с блюром —
+   при нажатии кнопка проседает вровень с гранью, как аркадная кнопка. */
 button {
-  font-family: var(--font-body);
+  font-family: var(--font-mono);
   font-weight: 600;
   font-size: 14px;
-  padding: 10px 18px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  box-shadow: 0 3px 0 0 var(--border);
+  transform: translateY(0);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.15s ease, background 0.15s ease;
 }
 button:hover:not(:disabled) {
   border-color: var(--cyan);
+}
+button:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 0 var(--border);
 }
 button:disabled {
   opacity: 0.4;
@@ -75,20 +106,24 @@ button:focus-visible {
 /* Основная кнопка действия (Сдать, Создать, Опубликовать) — залита ember */
 button.primary {
   background: var(--ember);
-  border-color: var(--ember);
-  color: #14151F;
+  border-color: var(--ember-dim);
+  color: var(--on-accent);
+  box-shadow: 0 3px 0 0 var(--ember-dim);
 }
 button.primary:hover:not(:disabled) {
   background: var(--ember-dim);
   border-color: var(--ember-dim);
 }
+button.primary:active:not(:disabled) {
+  box-shadow: 0 0 0 0 var(--ember-dim);
+}
 
 input {
   font-family: var(--font-body);
   font-size: 14px;
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--border);
   background: var(--surface);
   color: var(--text);
   margin-right: 8px;
@@ -99,13 +134,13 @@ input:focus-visible {
 }
 
 .page {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 32px 24px;
 }
 
-/* Сигнатурный элемент: LED-чип статуса — моноширинный, почти без
-   скругления, с точкой-индикатором. Цвет точки несёт смысл статуса. */
+/* Сигнатурный элемент: LED-чип статуса — пиксельным шрифтом, пилюлей,
+   с точкой-индикатором. Цвет точки несёт смысл статуса. */
 .status-chip {
   display: inline-flex;
   align-items: center;
@@ -115,9 +150,9 @@ input:focus-visible {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 2px;
-  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--border);
   background: var(--surface-2);
 }
 .status-chip::before {
@@ -139,45 +174,52 @@ input:focus-visible {
   font-size: 20px;
   font-weight: 600;
   color: var(--ember);
-  text-shadow: 0 0 12px rgba(255, 107, 53, 0.4);
+  text-shadow: 0 0 12px rgba(61, 110, 255, 0.35);
   font-variant-numeric: tabular-nums;
 }
 
 .card {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 16px 20px;
   margin-bottom: 10px;
 }
 
 /* Левая цветная полоса по статусу — задаётся модификатором на самой карточке */
 .card-list-item {
-  border-left: 3px solid var(--border);
+  border-left: 4px solid var(--border);
 }
 .card-list-item.status-published { border-left-color: var(--cyan); }
 .card-list-item.status-draft { border-left-color: var(--text-muted); }
 
 .message-banner {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
   padding: 10px 14px;
   border-radius: var(--radius);
+  border-left: 4px solid var(--border);
   background: var(--surface-2);
-  border: 1px solid var(--border);
+  border-top: 2px solid var(--border);
+  border-right: 2px solid var(--border);
+  border-bottom: 2px solid var(--border);
   color: var(--text-muted);
   margin-bottom: 16px;
 }
 .message-banner.error {
-  border-color: var(--danger);
+  border-left-color: var(--danger);
   color: var(--danger);
 }
 
 .wordmark {
-  font-family: var(--font-display);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 15px;
-  letter-spacing: -0.01em;
+  font-size: 17px;
+  letter-spacing: 0.01em;
 }
 .wordmark .accent { color: var(--ember); }
 
@@ -193,8 +235,8 @@ html {
 /* Анимации для экрана "Путь" — пульсация текущего доступного узла
    и лёгкое появление при загрузке, чтобы страница не была статичной. */
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4); }
-  50% { box-shadow: 0 0 0 12px rgba(78, 205, 196, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(14, 165, 183, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(14, 165, 183, 0); }
 }
 
 @keyframes node-appear {

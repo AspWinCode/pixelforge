@@ -57,18 +57,18 @@ export function LecturesPage() {
 
   return (
     <div className="page">
-      <h1>Лекции</h1>
+      <h1>Брифинги</h1>
       {message && <div className="message-banner">{message}</div>}
 
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
           <div className="card">
-            <h2 style={{ fontSize: '16px' }}>Создать лекцию</h2>
+            <h2 style={{ fontSize: '16px' }}>Создать брифинг</h2>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="Название лекции"
+                placeholder="Название брифинга"
                 style={{ ...inputStyle, flex: 1 }}
               />
               <button className="primary" onClick={handleCreateLecture}>Создать</button>
@@ -76,7 +76,7 @@ export function LecturesPage() {
           </div>
 
           <div className="card">
-            <h2 style={{ fontSize: '16px' }}>Все лекции</h2>
+            <h2 style={{ fontSize: '16px' }}>Все брифинги</h2>
             {lectures.map((l) => (
               <div
                 key={l.id}

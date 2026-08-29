@@ -6,6 +6,7 @@ import { LecturesPage } from './pages/LecturesPage';
 import { LecturePage } from './pages/LecturePage';
 import { PathPage } from './pages/PathPage';
 import { TrainerPage } from './pages/TrainerPage';
+import { SsoLandingPage } from './pages/SsoLandingPage';
 import { Header } from './components/Header';
 import { OnboardingFlow } from './components/OnboardingFlow';
 import { useSessionStore } from './store/session';
@@ -36,6 +37,7 @@ export default function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Navigate to="/path" replace />} />
+        <Route path="/sso" element={<SsoLandingPage />} />
         <Route path="/assignments/:id" element={<AssignmentPage />} />
         <Route path="/teacher" element={<TeacherPage />} />
         <Route path="/teacher/review/:assignmentId/:userId" element={<ReviewPage />} />

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { useSessionStore } from '../store/session';
 import { NpcInbox } from './NpcInbox';
@@ -23,31 +24,53 @@ export function Header() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [userId]);
 
+  const navLinkStyle: CSSProperties = {
+    fontFamily: 'var(--font-mono)',
+    fontSize: '12px',
+    fontWeight: 600,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+  };
+
   return (
-    <header
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '16px 24px',
-        borderBottom: '1px solid var(--border)',
-      }}
-    >
-      <Link to="/path" className="wordmark">
-        Pixel<span className="accent">Forge</span>
-      </Link>
-      <nav style={{ display: 'flex', gap: '20px', alignItems: 'center', fontSize: '14px' }}>
-        <Link id="tour-path-link" to="/path">Путь</Link>
-        <Link to="/teacher">Методист</Link>
-        <Link to="/trainer">Тренер</Link>
-        <Link to="/lectures">Лекции</Link>
-        {balance !== null && (
-          <div id="tour-token-counter" className="token-counter" style={{ fontSize: '16px' }}>
-            🪙 {balance}
-          </div>
-        )}
-        {userId && <NpcInbox userId={userId} />}
-      </nav>
+    <header style={{ borderBottom: '2px solid var(--border)' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          maxWidth: '960px',
+          margin: '0 auto',
+          padding: '16px 24px',
+        }}
+      >
+        <Link to="/path" className="wordmark">
+          <span aria-hidden="true">👾</span>
+          Pixel<span className="accent">Forge</span>
+        </Link>
+        <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <Link id="tour-path-link" to="/path" style={navLinkStyle}>Путь</Link>
+          <Link to="/teacher" style={navLinkStyle}>Методист</Link>
+          <Link to="/trainer" style={navLinkStyle}>Тренер</Link>
+          <Link to="/lectures" style={navLinkStyle}>Брифинги</Link>
+          {balance !== null && (
+            <div
+              id="tour-token-counter"
+              className="token-counter"
+              style={{
+                fontSize: '14px',
+                padding: '5px 12px',
+                borderRadius: '999px',
+                border: '2px solid var(--border)',
+                background: 'var(--surface-2)',
+              }}
+            >
+              🪙 {balance}
+            </div>
+          )}
+          {userId && <NpcInbox userId={userId} />}
+        </nav>
+      </div>
     </header>
   );
 }

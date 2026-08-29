@@ -59,7 +59,7 @@ export function CoachmarkTour({ onDone }: { onDone: () => void }) {
           height: rect.height + PAD * 2,
           border: '2px solid var(--cyan)',
           borderRadius: '6px',
-          boxShadow: '0 0 0 4000px rgba(20,21,31,.7), 0 0 18px rgba(78,205,196,.5)',
+          boxShadow: '0 0 0 4000px rgba(20,21,31,.6), 0 0 18px rgba(14,165,183,.5)',
           transition: 'left .25s ease, top .25s ease, width .25s ease, height .25s ease',
           pointerEvents: 'none',
         }}
@@ -77,7 +77,7 @@ export function CoachmarkTour({ onDone }: { onDone: () => void }) {
           padding: '10px 12px',
           fontSize: '13px',
           lineHeight: 1.4,
-          boxShadow: '0 8px 20px rgba(0,0,0,.4)',
+          boxShadow: '0 8px 20px rgba(23,25,35,.16)',
         }}
       >
         <div>{TOUR_STEPS[index].text}</div>

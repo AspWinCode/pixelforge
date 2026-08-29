@@ -37,7 +37,7 @@ export function LecturePage() {
   return (
     <div className="page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h1 style={{ marginBottom: 0 }}>Теория</h1>
+        <h1 style={{ marginBottom: 0 }}>Брифинг</h1>
         {(alreadyCompleted || justCompleted) && (
           <span className="status-chip status-reviewed">Пройдено</span>
         )}
@@ -71,7 +71,7 @@ export function LecturePage() {
         )}
         {isLast && !alreadyCompleted && !justCompleted && (
           <button className="primary" onClick={handleFinish}>
-            Прошёл теорию ✓
+            Прошёл брифинг ✓
           </button>
         )}
         {isLast && (alreadyCompleted || justCompleted) && (

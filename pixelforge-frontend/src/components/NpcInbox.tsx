@@ -2,11 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { fetchNpcMessages, markNpcMessageRead, type NpcMessage } from '../api/npc';
 import { NpcPopup } from './NpcPopup';
 import { playNotificationSound } from '../utils/sound';
+import ceoAvatar from '../assets/npc/ceo.png';
+import mentorAvatar from '../assets/npc/mentor.png';
+import artDirectorAvatar from '../assets/npc/art_director.png';
 
-const CHARACTER_EMOJI: Record<string, string> = {
-  MENTOR: '🧑‍🏫',
-  CEO: '💼',
-  ART_DIRECTOR: '🎨',
+const CHARACTER_AVATAR: Record<string, string> = {
+  MENTOR: mentorAvatar,
+  CEO: ceoAvatar,
+  ART_DIRECTOR: artDirectorAvatar,
 };
 
 export function NpcInbox({ userId }: { userId: number }) {
@@ -86,7 +89,7 @@ export function NpcInbox({ userId }: { userId: number }) {
             <span
               style={{
                 position: 'absolute', top: '-4px', right: '-4px',
-                background: 'var(--danger)', color: '#14151F',
+                background: 'var(--danger)', color: 'var(--on-accent)',
                 borderRadius: '50%', width: '16px', height: '16px',
                 fontSize: '10px', fontFamily: 'var(--font-mono)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -109,8 +112,17 @@ export function NpcInbox({ userId }: { userId: number }) {
                 onClick={() => handleMessageClick(m)}
                 style={{ padding: '8px 0', borderBottom: '1px solid var(--border)', opacity: m.isRead ? 0.6 : 1, cursor: 'pointer' }}
               >
-                <div style={{ fontSize: '13px' }}>
-                  {CHARACTER_EMOJI[m.character] ?? '🤖'} {m.message}
+                <div style={{ fontSize: '13px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  {CHARACTER_AVATAR[m.character] ? (
+                    <img
+                      src={CHARACTER_AVATAR[m.character]}
+                      alt=""
+                      style={{ width: '18px', height: 'auto', imageRendering: 'pixelated', flexShrink: 0 }}
+                    />
+                  ) : (
+                    <span>🤖</span>
+                  )}
+                  <span>{m.message}</span>
                 </div>
               </div>
             ))}

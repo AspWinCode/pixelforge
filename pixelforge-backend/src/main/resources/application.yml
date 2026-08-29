@@ -3,9 +3,9 @@ spring:
     name: pixelforge-backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/pixelforge
-    username: pixelforge
-    password: pixelforge
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/pixelforge}
+    username: ${DB_USERNAME:pixelforge}
+    password: ${DB_PASSWORD:pixelforge}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -39,12 +39,19 @@ logging:
 
 pixelforge:
   s3:
-    endpoint: http://localhost:9000
-    bucket: pixelforge-submissions
-    access-key: pixelforge
-    secret-key: pixelforge123
-    region: us-east-1
+    endpoint: ${S3_ENDPOINT:http://localhost:9000}
+    bucket: ${S3_BUCKET:pixelforge-submissions}
+    access-key: ${S3_ACCESS_KEY:pixelforge}
+    secret-key: ${S3_SECRET_KEY:pixelforge123}
+    region: ${S3_REGION:us-east-1}
   frontend:
-    origin: http://localhost:5173
+    origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+  gdevelop:
+    origin: ${GDEVELOP_ORIGIN:http://localhost:3500}
   lms:
-    webhook-secret: dev-lms-secret-change-me
+    webhook-secret: ${LMS_WEBHOOK_SECRET:dev-lms-secret-change-me}
+  auth:
+    # HS256 shared secret used to verify the LMS SSO launch JWT (POST
+    # /api/auth/lms-sso). Must match whatever the LMS side signs with —
+    # placeholder below is dev-only, never valid outside this machine.
+    lms-jwt-secret: ${LMS_JWT_SECRET:dev-lms-jwt-secret-change-me-please-32bytes-min}

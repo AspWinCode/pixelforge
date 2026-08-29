@@ -6,7 +6,7 @@ import {
   listSubmissions,
   uploadAssignmentImage,
   listAllAssignments,
-  fetchMyClasses,
+  fetchStaffClasses,
   type SubmissionListItem,
   type TeacherClass,
 } from '../api/teacher';
@@ -29,6 +29,7 @@ export function TeacherPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [tool, setTool] = useState<'SNAP' | 'GDEVELOP'>('SNAP');
   const [deadline, setDeadline] = useState('');
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [message, setMessage] = useState('');
@@ -40,7 +41,7 @@ export function TeacherPage() {
   const [submissions, setSubmissions] = useState<SubmissionListItem[]>([]);
 
   useEffect(() => {
-    fetchMyClasses(HARDCODED_TEACHER_ID).then((list) => {
+    fetchStaffClasses(HARDCODED_TEACHER_ID, 'METHODIST').then((list) => {
       setClasses(list);
       if (list.length > 0) setSelectedClassId(list[0].id);
     }).catch(() => {});
@@ -91,7 +92,7 @@ export function TeacherPage() {
         lectureId,
         title,
         description,
-        tool: 'SNAP',
+        tool,
         deadline: deadlineIso,
       });
 
@@ -107,6 +108,7 @@ export function TeacherPage() {
       );
       setTitle('');
       setDescription('');
+      setTool('SNAP');
       setDeadline('');
       setSelectedLectureId('');
       setPendingFiles([]);
@@ -150,7 +152,7 @@ export function TeacherPage() {
   if (classes.length === 0) {
     return (
       <div className="page">
-        <h1>Кабинет учителя</h1>
+        <h1>Мастерская методиста</h1>
         <div className="message-banner">У вас пока нет ни одного класса.</div>
       </div>
     );
@@ -170,7 +172,7 @@ export function TeacherPage() {
   return (
     <div className="page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
-        <h1 style={{ marginBottom: 0 }}>Кабинет учителя</h1>
+        <h1 style={{ marginBottom: 0 }}>Мастерская методиста</h1>
         {classes.length > 1 && (
           <select value={selectedClassId ?? ''} onChange={(e) => setSelectedClassId(Number(e.target.value))}>
             {classes.map((c) => (
@@ -208,10 +210,22 @@ export function TeacherPage() {
             onChange={(e) => setSelectedLectureId(e.target.value)}
             style={{ ...inputStyle, marginBottom: '8px' }}
           >
-            <option value="">Без лекции</option>
+            <option value="">Без брифинга</option>
             {lectures.map((l) => (
               <option key={l.id} value={l.id}>{l.title}</option>
             ))}
+          </select>
+
+          <label style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+            Движок
+          </label>
+          <select
+            value={tool}
+            onChange={(e) => setTool(e.target.value as 'SNAP' | 'GDEVELOP')}
+            style={{ ...inputStyle, marginBottom: '8px' }}
+          >
+            <option value="SNAP">Snap! (блочный, для младших)</option>
+            <option value="GDEVELOP">GDevelop (для старших)</option>
           </select>
 
           <label style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>

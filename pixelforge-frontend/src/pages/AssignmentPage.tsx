@@ -15,6 +15,7 @@ import { useSessionStore } from '../store/session';
 import { API_ORIGIN } from '../api/client';
 
 const SNAP_URL = import.meta.env.VITE_SNAP_URL;
+const GDEVELOP_URL = import.meta.env.VITE_GDEVELOP_URL;
 const AUTOSAVE_INTERVAL_MS = 3 * 60 * 1000;
 
 // Возвращает текст и "срочность" дедлайна — используется и для текста,
@@ -103,13 +104,17 @@ export function AssignmentPage() {
   }, [assignmentId, userId]);
 
   useEffect(() => {
+    // Автосохранение через мост postMessage — только для Snap!. GDevelop
+    // сохраняет сам, изнутри своего редактора (см. PixelForgeStorageProvider
+    // в самосборке GDevelop), поэтому здесь ему нечего делать.
+    if (assignment?.tool !== 'SNAP') return;
     const interval = setInterval(() => {
       if (statusRef.current === 'IN_PROGRESS') {
         handleSave(true);
       }
     }, AUTOSAVE_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [handleSave]);
+  }, [handleSave, assignment?.tool]);
 
   async function handleIframeLoad() {
     if (!userId || !iframeRef.current?.contentWindow) return;
@@ -133,18 +138,25 @@ export function AssignmentPage() {
   }
 
   async function handleSubmit() {
-    if (!userId || !iframeRef.current?.contentWindow) return;
+    if (!userId) return;
     try {
       setIsError(false);
-      setMessage('Сохраняю финальную версию...');
-      const xml = await getProjectXML(iframeRef.current.contentWindow);
-      await saveProject(assignmentId, userId, xml);
-      setLastSavedAt(new Date());
+
+      // Snap! отдаёт финальный XML через мост только по явному запросу —
+      // забираем его перед сдачей. GDevelop сохраняет сам по ходу работы
+      // (свой StorageProvider внутри редактора), поэтому здесь просто сдаём.
+      if (assignment?.tool === 'SNAP') {
+        if (!iframeRef.current?.contentWindow) return;
+        setMessage('Сохраняю финальную версию...');
+        const xml = await getProjectXML(iframeRef.current.contentWindow);
+        await saveProject(assignmentId, userId, xml);
+        setLastSavedAt(new Date());
+      }
 
       setMessage('Отправляю на проверку...');
       const submission = await submitAssignment(assignmentId, userId);
       setStatus(submission.status);
-      setMessage('Задание сдано! Ожидает проверки учителем.');
+      setMessage('Задание сдано! Ожидает проверки методистом.');
     } catch (err) {
       setIsError(true);
       setMessage('Ошибка при сдаче: ' + (err as Error).message);
@@ -197,24 +209,50 @@ export function AssignmentPage() {
         </p>
       )}
 
-      <iframe
-        ref={iframeRef}
-        src={SNAP_URL}
-        width="100%"
-        height="600"
-        style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: '12px' }}
-        title="Snap! редактор"
-        onLoad={handleIframeLoad}
-      />
+      {assignment?.tool === 'GDEVELOP' ? (
+        <>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+            GDevelop сохраняет прогресс сам — жми Ctrl+S прямо в редакторе.
+          </p>
+          {userId && (
+            <iframe
+              src={`${GDEVELOP_URL}/?project=${encodeURIComponent(
+                `${API_ORIGIN}/api/assignments/${assignmentId}/submissions/project?userId=${userId}`
+              )}`}
+              width="100%"
+              height="700"
+              style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: '12px' }}
+              title="GDevelop редактор"
+            />
+          )}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="primary" onClick={handleSubmit} disabled={status === 'SUBMITTED'}>
+              {status === 'SUBMITTED' ? 'Уже сдано' : 'Сдать задание'}
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <iframe
+            ref={iframeRef}
+            src={SNAP_URL}
+            width="100%"
+            height="600"
+            style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: '12px' }}
+            title="Snap! редактор"
+            onLoad={handleIframeLoad}
+          />
 
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <button onClick={() => handleSave(false)} disabled={saving || status === 'SUBMITTED'}>
-          {saving ? 'Сохраняю...' : 'Сохранить'}
-        </button>
-        <button className="primary" onClick={handleSubmit} disabled={status === 'SUBMITTED'}>
-          {status === 'SUBMITTED' ? 'Уже сдано' : 'Сдать задание'}
-        </button>
-      </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => handleSave(false)} disabled={saving || status === 'SUBMITTED'}>
+              {saving ? 'Сохраняю...' : 'Сохранить'}
+            </button>
+            <button className="primary" onClick={handleSubmit} disabled={status === 'SUBMITTED'}>
+              {status === 'SUBMITTED' ? 'Уже сдано' : 'Сдать задание'}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

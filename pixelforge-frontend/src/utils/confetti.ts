@@ -1,4 +1,4 @@
-const COLORS = ['#FF6B35', '#4ECDC4', '#6FCF97', '#F2E9DC'];
+const COLORS = ['#3D6EFF', '#0EA5B7', '#1FAF6B', '#171923'];
 
 export function launchConfetti(canvas: HTMLCanvasElement) {
   const ctx = canvas.getContext('2d');

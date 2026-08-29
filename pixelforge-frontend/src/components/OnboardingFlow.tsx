@@ -137,11 +137,11 @@ export function OnboardingFlow({ userId, onFinish }: { userId: number; onFinish:
             transform: 'translate(-50%, -50%)',
             width: 'min(340px, 84vw)',
             background: 'var(--surface)',
-            border: '2px solid var(--success)',
-            borderRadius: '6px',
+            border: '3px solid var(--success)',
+            borderRadius: 'var(--radius-lg)',
             padding: '22px 20px',
             textAlign: 'center',
-            boxShadow: '0 20px 50px rgba(0,0,0,.55)',
+            boxShadow: '0 20px 50px rgba(23,25,35,.18)',
             zIndex: 160,
           }}
         >
@@ -151,7 +151,7 @@ export function OnboardingFlow({ userId, onFinish }: { userId: number; onFinish:
               fontSize: '34px',
               fontWeight: 700,
               color: 'var(--ember)',
-              textShadow: '0 0 16px rgba(255,107,53,.4)',
+              textShadow: '0 0 16px rgba(61,110,255,.35)',
               fontVariantNumeric: 'tabular-nums',
             }}
           >
@@ -171,8 +171,8 @@ export function OnboardingFlow({ userId, onFinish }: { userId: number; onFinish:
               letterSpacing: '.04em',
               textTransform: 'uppercase',
               padding: '5px 12px',
-              borderRadius: '2px',
-              border: '1px solid var(--success)',
+              borderRadius: '999px',
+              border: '2px solid var(--success)',
               color: 'var(--success)',
               margin: '14px 0 16px',
             }}

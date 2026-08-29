@@ -63,7 +63,7 @@ export function PathPage() {
   const containerHeight = nodes.length > 0 ? (nodes.length - 1) * VERTICAL_GAP + NODE_SIZE : 0;
 
   return (
-    <div className="page" style={{ maxWidth: '960px' }}>
+    <div className="page">
       <h1>Путь</h1>
 
       <div style={{ display: 'flex', gap: '28px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -185,7 +185,7 @@ export function PathPage() {
                         letterSpacing: '0.05em',
                       }}
                     >
-                      {node.type === 'LECTURE' ? 'теория' : 'задание'}
+                      {node.type === 'LECTURE' ? 'брифинг' : 'задание'}
                     </div>
                   </div>
                 );

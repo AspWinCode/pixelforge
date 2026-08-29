@@ -15,11 +15,21 @@ public class CorsConfig implements WebMvcConfigurer {
     @Value("${pixelforge.frontend.origin}")
     private String frontendOrigin;
 
+    // Отдельный origin для встроенного редактора GDevelop (свой отдельный
+    // self-hosted билд, не часть основного фронтенда) — его кастомный
+    // StorageProvider ходит в /api/**submissions напрямую из iframe.
+    @Value("${pixelforge.gdevelop.origin}")
+    private String gdevelopOrigin;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-            .allowedOrigins(frontendOrigin)
+            .allowedOrigins(frontendOrigin, gdevelopOrigin)
             .allowedMethods("GET", "POST", "PUT", "DELETE")
-            .allowedHeaders("*");
+            .allowedHeaders("*")
+            // Нужно для сессионной куки LMS SSO (POST /api/auth/lms-sso) —
+            // фронтенд и бэкенд на разных origin'ах даже в деве (5173 vs
+            // 8080), без этого браузер её просто не отправит.
+            .allowCredentials(true);
     }
 }

@@ -6,7 +6,7 @@ export interface CreateAssignmentPayload {
   lectureId: number | null;
   title: string;
   description: string;
-  tool: 'SNAP';
+  tool: 'SNAP' | 'GDEVELOP';
   deadline: string | null;
 }
 
@@ -58,13 +58,6 @@ export async function uploadAssignmentImage(assignmentId: number, file: File) {
 
 export async function listAllAssignments(classId: number): Promise<Assignment[]> {
   const { data } = await apiClient.get<Assignment[]>(`/classes/${classId}/assignments/all`);
-  return data;
-}
-
-export async function fetchMyClasses(teacherId: number): Promise<TeacherClass[]> {
-  const { data } = await apiClient.get<TeacherClass[]>('/teachers/classes', {
-    params: { teacherId },
-  });
   return data;
 }
 
