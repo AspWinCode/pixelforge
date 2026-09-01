@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import studio.pixelforge.backend.auth.InvalidSsoTokenException;
 import studio.pixelforge.backend.auth.SessionAuthenticationFilter;
 import studio.pixelforge.backend.auth.SessionUser;
 import studio.pixelforge.backend.user.User;
@@ -35,9 +36,12 @@ public class PortalAuthController {
     }
 
     @GetMapping("/sso")
-    public void sso(@RequestParam("token") String token,
+    public void sso(@RequestParam(value = "token", required = false) String token,
                     HttpServletRequest httpRequest,
                     HttpServletResponse httpResponse) throws IOException {
+        if (token == null || token.isBlank()) {
+            throw new InvalidSsoTokenException("Missing SSO token");
+        }
         PortalSsoClaims claims = verifier.verify(token);
         User user = studentService.findOrCreate(claims);
 
