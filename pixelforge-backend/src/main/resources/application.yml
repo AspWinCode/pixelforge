@@ -55,3 +55,11 @@ pixelforge:
     # /api/auth/lms-sso). Must match whatever the LMS side signs with —
     # placeholder below is dev-only, never valid outside this machine.
     lms-jwt-secret: ${LMS_JWT_SECRET:dev-lms-jwt-secret-change-me-please-32bytes-min}
+  portal:
+    # Интеграция с кабинетом ученика (learning-portal, tirskix.space).
+    # sso-shared-secret — общий HS256-секрет (у портала это
+    # SSO_KODEX_SHARED_SECRET). Пустой = интеграция выключена.
+    sso-shared-secret: ${SSO_KODEX_SHARED_SECRET:}
+    base-url: ${PORTAL_BASE_URL:https://tirskix.space}
+    catalog-item-code: ${PORTAL_CATALOG_ITEM_CODE:pixelforge}
+    sso-audience: ${PORTAL_SSO_AUDIENCE:pixelforge}

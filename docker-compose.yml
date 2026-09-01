@@ -83,6 +83,9 @@ services:
       GDEVELOP_ORIGIN: ${GDEVELOP_ORIGIN}
       LMS_WEBHOOK_SECRET: ${LMS_WEBHOOK_SECRET}
       LMS_JWT_SECRET: ${LMS_JWT_SECRET}
+      # Интеграция с кабинетом ученика (learning-portal).
+      SSO_KODEX_SHARED_SECRET: ${SSO_KODEX_SHARED_SECRET:-}
+      PORTAL_BASE_URL: ${PORTAL_BASE_URL:-https://tirskix.space}
       SERVER_FORWARD_HEADERS_STRATEGY: framework
     depends_on:
       postgres:

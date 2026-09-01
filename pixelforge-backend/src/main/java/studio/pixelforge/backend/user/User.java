@@ -29,6 +29,12 @@ public class User {
     @Column(name = "lms_user_id", nullable = false)
     private String lmsUserId;
 
+    // Идентификатор ученика в кабинете (learning-portal), вида
+    // "lp-student-{id}". Заполнен только у пользователей, зашедших по SSO
+    // из кабинета; у остальных null. См. пакет portal.
+    @Column(name = "external_ref")
+    private String externalRef;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;

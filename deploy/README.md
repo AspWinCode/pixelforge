@@ -42,6 +42,27 @@ docker compose build
 docker compose up -d
 ```
 
+## Интеграция с кабинетом ученика (learning-portal)
+
+PixelForge реализует тот же контракт, что и другие площадки (КОДЭКС):
+
+| Направление | Эндпоинт |
+|---|---|
+| Вход по SSO из кабинета | `GET /api/auth/sso?token=<JWT>` (HS256, `aud=pixelforge`) |
+| Прогресс ученика для тренера/методиста | `GET /api/internal/lms-progress/lp-student-{id}` (заголовок `X-LP-Signature`) |
+| Обратный пуш прогресса | `POST {PORTAL_BASE_URL}/api/v1/student-portal/progress-sync` (`X-Kodex-Signature`, `catalog_item_code=pixelforge`) |
+
+Переменные окружения (`.env`):
+
+* `SSO_KODEX_SHARED_SECRET` — общий HS256-секрет (тот же, что у портала для
+  КОДЭКС). Пустой = интеграция выключена.
+* `PORTAL_BASE_URL` — база кабинета для обратного пуша (по умолчанию
+  `https://tirskix.space`).
+
+На стороне портала: пункт витрины `catalog_item.code = "pixelforge"` c
+`external_url = https://pixelforge.tirskix.space/api/auth/sso`, переменная
+`PIXELFORGE_BASE_URL`, затем `alembic upgrade head`.
+
 ## Заметки
 
 * `.env` на сервере не коммитится.

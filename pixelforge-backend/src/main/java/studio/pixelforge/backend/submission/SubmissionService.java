@@ -1,6 +1,7 @@
 package studio.pixelforge.backend.submission;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -8,6 +9,7 @@ import studio.pixelforge.backend.assignment.Assignment;
 import studio.pixelforge.backend.assignment.AssignmentRepository;
 import studio.pixelforge.backend.common.exception.PayloadTooLargeException;
 import studio.pixelforge.backend.npc.NpcService;
+import studio.pixelforge.backend.portal.StudentProgressChangedEvent;
 import studio.pixelforge.backend.storage.S3Service;
 import studio.pixelforge.backend.token.TokenService;
 import studio.pixelforge.backend.user.User;
@@ -31,19 +33,22 @@ public class SubmissionService {
     private final TokenService tokenService;
     private final S3Service s3Service;
     private final NpcService npcService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public SubmissionService(SubmissionRepository submissionRepository,
                               AssignmentRepository assignmentRepository,
                               UserRepository userRepository,
                               TokenService tokenService,
                               S3Service s3Service,
-                              NpcService npcService) {
+                              NpcService npcService,
+                              ApplicationEventPublisher eventPublisher) {
         this.submissionRepository = submissionRepository;
         this.assignmentRepository = assignmentRepository;
         this.userRepository = userRepository;
         this.tokenService = tokenService;
         this.s3Service = s3Service;
         this.npcService = npcService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -144,6 +149,7 @@ public class SubmissionService {
         if (submission.getStatus() == SubmissionStatus.IN_PROGRESS) {
             submission.setStatus(SubmissionStatus.SUBMITTED);
             npcService.onAssignmentSubmitted(userId, submission.getAssignment().getTitle());
+            eventPublisher.publishEvent(new StudentProgressChangedEvent(userId));
         }
 
         return submission;
@@ -170,6 +176,7 @@ public class SubmissionService {
         );
 
         npcService.onTokensAwarded(userId, TOKENS_FOR_REVIEWED_SUBMISSION);
+        eventPublisher.publishEvent(new StudentProgressChangedEvent(userId));
 
         return submission;
     }
