@@ -1,0 +1,11 @@
+.git
+**/node_modules
+**/target
+**/dist
+pixelforge-backend
+gdevelop-source
+*.log
+snap-test.html
+.env
+.env.*
+!.env.example

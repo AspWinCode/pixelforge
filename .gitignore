@@ -1,2 +1,10 @@
 .git.bak/
 *.git.bak/
+
+# Секреты окружения (на сервере создаётся вручную из .env.example)
+.env
+
+# Артефакты сборки
+node_modules/
+dist/
+target/

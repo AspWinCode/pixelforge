@@ -1,0 +1,6 @@
+target/
+.git/
+*.log
+big_payload.json
+HELP.md
+docker-compose.yml
