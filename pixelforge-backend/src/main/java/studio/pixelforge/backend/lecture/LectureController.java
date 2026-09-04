@@ -1,11 +1,13 @@
 package studio.pixelforge.backend.lecture;
 
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
+// Ученические / общие read-эндпоинты лекций. Authoring (создание лекций и
+// карточек) вынесен в studio.pixelforge.backend.admin.AdminLectureController
+// под /api/admin/lectures.
 @RestController
 @RequestMapping("/api/lectures")
 public class LectureController {
@@ -16,19 +18,9 @@ public class LectureController {
         this.lectureService = lectureService;
     }
 
-    @PostMapping
-    public LectureResponse create(@Valid @RequestBody CreateLectureRequest request) {
-        return LectureResponse.from(lectureService.create(request.title()));
-    }
-
     @GetMapping
     public List<LectureResponse> listAll() {
         return lectureService.listAll().stream().map(LectureResponse::from).toList();
-    }
-
-    @PostMapping("/{id}/cards")
-    public LectureCardResponse addCard(@PathVariable Long id, @Valid @RequestBody AddCardRequest request) {
-        return LectureCardResponse.from(lectureService.addCard(id, request.cardType(), request.content()));
     }
 
     @GetMapping("/{id}/cards")

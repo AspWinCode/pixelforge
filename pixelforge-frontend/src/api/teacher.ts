@@ -1,14 +1,9 @@
 import { apiClient } from './client';
 import type { Assignment } from './assignments';
 
-export interface CreateAssignmentPayload {
-  classId: number;
-  lectureId: number | null;
-  title: string;
-  description: string;
-  tool: 'SNAP' | 'GDEVELOP';
-  deadline: string | null;
-}
+// Создание/публикация заданий и загрузка картинок переехали в студию
+// методиста на портале (learning-portal, /pixelforge). Здесь остались
+// только read-эндпоинты и проверка сдач тренером.
 
 export interface SubmissionListItem {
   id: number;
@@ -23,16 +18,6 @@ export interface TeacherClass {
   name: string;
 }
 
-export async function createAssignment(payload: CreateAssignmentPayload): Promise<Assignment> {
-  const { data } = await apiClient.post<Assignment>('/assignments', payload);
-  return data;
-}
-
-export async function publishAssignment(assignmentId: number): Promise<Assignment> {
-  const { data } = await apiClient.post<Assignment>(`/assignments/${assignmentId}/publish`);
-  return data;
-}
-
 export async function listSubmissions(assignmentId: number): Promise<SubmissionListItem[]> {
   const { data } = await apiClient.get<SubmissionListItem[]>(`/assignments/${assignmentId}/submissions`);
   return data;
@@ -44,15 +29,6 @@ export async function reviewSubmission(assignmentId: number, userId: number) {
     null,
     { params: { userId } }
   );
-  return data;
-}
-
-export async function uploadAssignmentImage(assignmentId: number, file: File) {
-  const formData = new FormData();
-  formData.append('file', file);
-  const { data } = await apiClient.post(`/assignments/${assignmentId}/images`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
   return data;
 }
 

@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import { createLecture, listLectures, addCard, getCards, type Lecture, type LectureCard, type CardType } from '../api/lectures';
+import { listLectures, getCards, type Lecture, type LectureCard, type CardType } from '../api/lectures';
+
+// Создание брифингов и карточек переехало в студию методиста на портале
+// (learning-portal, раздел /pixelforge). Здесь — только просмотр.
 
 const CARD_TYPE_LABELS: Record<CardType, string> = {
   TEXT: 'Текст',
@@ -10,25 +13,12 @@ const CARD_TYPE_LABELS: Record<CardType, string> = {
 
 export function LecturesPage() {
   const [lectures, setLectures] = useState<Lecture[]>([]);
-  const [newTitle, setNewTitle] = useState('');
   const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
   const [cards, setCards] = useState<LectureCard[]>([]);
-  const [cardType, setCardType] = useState<CardType>('TEXT');
-  const [cardContent, setCardContent] = useState('');
-  const [message, setMessage] = useState('');
 
   useEffect(() => {
     listLectures().then(setLectures).catch(() => {});
   }, []);
-
-  async function handleCreateLecture() {
-    if (!newTitle.trim()) return;
-    const lecture = await createLecture(newTitle);
-    setLectures((prev) => [...prev, lecture]);
-    setNewTitle('');
-    setSelectedLecture(lecture);
-    setCards([]);
-  }
 
   async function handleSelectLecture(lecture: Lecture) {
     setSelectedLecture(lecture);
@@ -36,47 +26,15 @@ export function LecturesPage() {
     setCards(list);
   }
 
-  async function handleAddCard() {
-    if (!selectedLecture || !cardContent.trim()) return;
-    const card = await addCard(selectedLecture.id, cardType, cardContent);
-    setCards((prev) => [...prev, card]);
-    setCardContent('');
-    setMessage('Карточка добавлена');
-  }
-
-  const inputStyle = {
-    width: '100%',
-    padding: '10px 12px',
-    borderRadius: 'var(--radius)',
-    border: '1px solid var(--border)',
-    background: 'var(--surface)',
-    color: 'var(--text)',
-    fontFamily: 'var(--font-body)',
-    fontSize: '14px',
-  };
-
   return (
     <div className="page">
       <h1>Брифинги</h1>
-      {message && <div className="message-banner">{message}</div>}
 
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
           <div className="card">
-            <h2 style={{ fontSize: '16px' }}>Создать брифинг</h2>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <input
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="Название брифинга"
-                style={{ ...inputStyle, flex: 1 }}
-              />
-              <button className="primary" onClick={handleCreateLecture}>Создать</button>
-            </div>
-          </div>
-
-          <div className="card">
             <h2 style={{ fontSize: '16px' }}>Все брифинги</h2>
+            {lectures.length === 0 && <p style={{ color: 'var(--text-muted)' }}>Пока нет брифингов</p>}
             {lectures.map((l) => (
               <div
                 key={l.id}
@@ -99,7 +57,7 @@ export function LecturesPage() {
           <div style={{ flex: 1 }}>
             <div className="card">
               <h2 style={{ fontSize: '16px' }}>Карточки: «{selectedLecture.title}»</h2>
-
+              {cards.length === 0 && <p style={{ color: 'var(--text-muted)' }}>В брифинге пока нет карточек</p>}
               {cards.map((c) => (
                 <div key={c.id} style={{ padding: '8px 0', borderTop: '1px solid var(--border)' }}>
                   <span className="status-chip" style={{ marginBottom: '4px', display: 'inline-block' }}>
@@ -110,26 +68,6 @@ export function LecturesPage() {
                   </div>
                 </div>
               ))}
-
-              <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
-                <select
-                  value={cardType}
-                  onChange={(e) => setCardType(e.target.value as CardType)}
-                  style={{ ...inputStyle, marginBottom: '8px' }}
-                >
-                  {Object.entries(CARD_TYPE_LABELS).map(([key, label]) => (
-                    <option key={key} value={key}>{label}</option>
-                  ))}
-                </select>
-                <textarea
-                  value={cardContent}
-                  onChange={(e) => setCardContent(e.target.value)}
-                  placeholder={cardType === 'TEXT' ? 'Текст карточки' : cardType === 'SNAP_SNIPPET' ? 'XML сниппета' : 'URL'}
-                  rows={4}
-                  style={{ ...inputStyle, resize: 'vertical', marginBottom: '8px' }}
-                />
-                <button className="primary" onClick={handleAddCard}>Добавить карточку</button>
-              </div>
             </div>
           </div>
         )}

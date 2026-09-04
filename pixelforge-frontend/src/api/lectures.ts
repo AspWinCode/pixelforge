@@ -1,5 +1,9 @@
 import { apiClient } from './client';
 
+// Создание лекций и карточек переехало в студию методиста на портале
+// (learning-portal, /pixelforge). Здесь остались только read-эндпоинты и
+// отметка прохождения учеником.
+
 export type CardType = 'TEXT' | 'IMAGE' | 'VIDEO' | 'SNAP_SNIPPET';
 
 export interface Lecture {
@@ -14,18 +18,8 @@ export interface LectureCard {
   content: string;
 }
 
-export async function createLecture(title: string): Promise<Lecture> {
-  const { data } = await apiClient.post<Lecture>('/lectures', { title });
-  return data;
-}
-
 export async function listLectures(): Promise<Lecture[]> {
   const { data } = await apiClient.get<Lecture[]>('/lectures');
-  return data;
-}
-
-export async function addCard(lectureId: number, cardType: CardType, content: string): Promise<LectureCard> {
-  const { data } = await apiClient.post<LectureCard>(`/lectures/${lectureId}/cards`, { cardType, content });
   return data;
 }
 

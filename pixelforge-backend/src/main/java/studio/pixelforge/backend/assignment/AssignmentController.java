@@ -1,16 +1,14 @@
 package studio.pixelforge.backend.assignment;
 
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 
+// Ученические / общие read-эндпоинты заданий. Authoring (создание,
+// публикация, загрузка картинок) вынесен в
+// studio.pixelforge.backend.admin.AdminAssignmentController под /api/admin/**.
 @RestController
 @RequestMapping("/api")
 public class AssignmentController {
@@ -21,20 +19,9 @@ public class AssignmentController {
         this.assignmentService = assignmentService;
     }
 
-    @PostMapping("/assignments")
-    @ResponseStatus(HttpStatus.CREATED)
-    public AssignmentResponse create(@Valid @RequestBody CreateAssignmentRequest request) {
-        return AssignmentResponse.from(assignmentService.create(request));
-    }
-
     @GetMapping("/assignments/{id}")
     public AssignmentResponse getById(@PathVariable Long id) {
         return AssignmentResponse.from(assignmentService.getById(id));
-    }
-
-    @PostMapping("/assignments/{id}/publish")
-    public AssignmentResponse publish(@PathVariable Long id) {
-        return AssignmentResponse.from(assignmentService.publish(id));
     }
 
     @GetMapping("/classes/{classId}/assignments")
@@ -49,18 +36,6 @@ public class AssignmentController {
         return assignmentService.listAllForClass(classId).stream()
             .map(AssignmentResponse::from)
             .toList();
-    }
-
-    @PostMapping(value = "/assignments/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public AssignmentImageResponse uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        try {
-            AssignmentImage image = assignmentService.addImage(
-                id, file.getOriginalFilename(), file.getBytes(), file.getContentType()
-            );
-            return AssignmentImageResponse.from(image);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
     }
 
     @GetMapping("/assignments/{id}/images")
