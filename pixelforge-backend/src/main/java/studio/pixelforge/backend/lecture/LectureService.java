@@ -3,6 +3,7 @@ package studio.pixelforge.backend.lecture;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import studio.pixelforge.backend.assignment.AssignmentRepository;
 import studio.pixelforge.backend.organization.Organization;
 import studio.pixelforge.backend.organization.OrganizationRepository;
 import studio.pixelforge.backend.user.User;
@@ -21,17 +22,86 @@ public class LectureService {
     private final LectureProgressRepository lectureProgressRepository;
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
+    private final AssignmentRepository assignmentRepository;
 
     public LectureService(LectureRepository lectureRepository,
                            LectureCardRepository lectureCardRepository,
                            LectureProgressRepository lectureProgressRepository,
                            OrganizationRepository organizationRepository,
-                           UserRepository userRepository) {
+                           UserRepository userRepository,
+                           AssignmentRepository assignmentRepository) {
         this.lectureRepository = lectureRepository;
         this.lectureCardRepository = lectureCardRepository;
         this.lectureProgressRepository = lectureProgressRepository;
         this.organizationRepository = organizationRepository;
         this.userRepository = userRepository;
+        this.assignmentRepository = assignmentRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public Lecture getById(Long id) {
+        return lectureRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Lecture not found: " + id));
+    }
+
+    @Transactional
+    public Lecture update(Long id, String title) {
+        Lecture lecture = getById(id);
+        if (title != null && !title.isBlank()) {
+            lecture.setTitle(title);
+        }
+        return lecture;
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Lecture lecture = getById(id);
+        if (assignmentRepository.existsByLecture_Id(id)) {
+            throw new IllegalStateException("Lecture is attached to one or more tasks");
+        }
+        lectureProgressRepository.deleteAll(lectureProgressRepository.findByLecture_Id(id));
+        lectureCardRepository.deleteAll(lectureCardRepository.findByLecture_IdOrderByPositionAsc(id));
+        lectureRepository.delete(lecture);
+    }
+
+    @Transactional
+    public LectureCard updateCard(Long cardId, CardType cardType, String content) {
+        LectureCard card = lectureCardRepository.findById(cardId)
+            .orElseThrow(() -> new EntityNotFoundException("Lecture card not found: " + cardId));
+        if (cardType != null) {
+            card.setCardType(cardType);
+        }
+        if (content != null) {
+            card.setContent(content);
+        }
+        return card;
+    }
+
+    @Transactional
+    public void deleteCard(Long cardId) {
+        if (!lectureCardRepository.existsById(cardId)) {
+            throw new EntityNotFoundException("Lecture card not found: " + cardId);
+        }
+        lectureCardRepository.deleteById(cardId);
+    }
+
+    @Transactional
+    public void reorderCards(Long lectureId, List<Long> orderedIds) {
+        List<LectureCard> cards = lectureCardRepository.findAllById(orderedIds);
+        if (cards.size() != orderedIds.size()) {
+            throw new EntityNotFoundException("One or more card ids do not exist");
+        }
+        for (LectureCard card : cards) {
+            if (!card.getLecture().getId().equals(lectureId)) {
+                throw new IllegalStateException("Card " + card.getId() + " does not belong to lecture " + lectureId);
+            }
+        }
+        for (int i = 0; i < orderedIds.size(); i++) {
+            Long cardId = orderedIds.get(i);
+            int position = i;
+            cards.stream().filter(c -> c.getId().equals(cardId)).findFirst()
+                .ifPresent(c -> c.setPosition(position));
+        }
     }
 
     @Transactional

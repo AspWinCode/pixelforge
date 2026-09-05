@@ -9,4 +9,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     List<Assignment> findByClassEntity_IdAndStatus(Long classId, AssignmentStatus status);
 
     List<Assignment> findByClassEntity_Id(Long classId);
+
+    boolean existsByLecture_Id(Long lectureId);
 }
