@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// Ученические / общие read-эндпоинты заданий. Authoring (создание,
+// Ученические / общие read-эндпоинты заданий. Authoring (создание задач,
 // публикация, загрузка картинок) вынесен в
-// studio.pixelforge.backend.admin.AdminAssignmentController под /api/admin/**.
+// studio.pixelforge.backend.admin.AdminTaskController под /api/admin/**.
 @RestController
 @RequestMapping("/api")
 public class AssignmentController {

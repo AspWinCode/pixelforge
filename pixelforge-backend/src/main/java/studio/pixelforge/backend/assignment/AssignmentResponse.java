@@ -11,19 +11,21 @@ public record AssignmentResponse(
     AssignmentTool tool,
     AssignmentStatus status,
     Instant deadline,
-    Instant createdAt
+    Instant createdAt,
+    Instant updatedAt
 ) {
     public static AssignmentResponse from(Assignment a) {
         return new AssignmentResponse(
             a.getId(),
-            a.getClassEntity().getId(),
+            a.getClassEntity() != null ? a.getClassEntity().getId() : null,
             a.getLecture() != null ? a.getLecture().getId() : null,
             a.getTitle(),
             a.getDescription(),
             a.getTool(),
             a.getStatus(),
             a.getDeadline(),
-            a.getCreatedAt()
+            a.getCreatedAt(),
+            a.getUpdatedAt()
         );
     }
 }

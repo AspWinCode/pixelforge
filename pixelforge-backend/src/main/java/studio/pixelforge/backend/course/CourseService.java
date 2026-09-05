@@ -16,13 +16,16 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final CourseNodeRepository courseNodeRepository;
+    private final NodeTaskRepository nodeTaskRepository;
     private final OrganizationRepository organizationRepository;
 
     public CourseService(CourseRepository courseRepository,
                           CourseNodeRepository courseNodeRepository,
+                          NodeTaskRepository nodeTaskRepository,
                           OrganizationRepository organizationRepository) {
         this.courseRepository = courseRepository;
         this.courseNodeRepository = courseNodeRepository;
+        this.nodeTaskRepository = nodeTaskRepository;
         this.organizationRepository = organizationRepository;
     }
 
@@ -104,7 +107,8 @@ public class CourseService {
     public CourseTreeResponse tree(Long id) {
         Course course = getById(id);
         List<CourseNode> nodes = courseNodeRepository.findByCourse_IdOrderBySortOrderAsc(id);
-        return CourseTreeResponse.build(course, nodes);
+        List<NodeTask> nodeTasks = nodeTaskRepository.findByNode_Course_IdOrderBySortOrderAsc(id);
+        return CourseTreeResponse.build(course, nodes, nodeTasks);
     }
 
     // explicitSlug задан и непустой -> используем как есть, проверив

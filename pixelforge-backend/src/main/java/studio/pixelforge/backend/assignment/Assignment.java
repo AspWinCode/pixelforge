@@ -20,8 +20,10 @@ public class Assignment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // nullable: задачи, созданные в студии методиста (портал /pixelforge),
+    // это шаблоны в дереве курса без привязки к классу (см. спеку студии §A.1).
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id", nullable = false)
+    @JoinColumn(name = "class_id")
     private ClassEntity classEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,14 +49,24 @@ public class Assignment {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
     @PrePersist
     void onCreate() {
+        Instant now = Instant.now();
         if (createdAt == null) {
-            createdAt = Instant.now();
+            createdAt = now;
         }
+        updatedAt = now;
         if (status == null) {
             status = AssignmentStatus.DRAFT;
         }
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        updatedAt = Instant.now();
     }
 
     public Assignment(ClassEntity classEntity, Lecture lecture, String title, String description, AssignmentTool tool, Instant deadline) {
@@ -64,5 +76,11 @@ public class Assignment {
         this.description = description;
         this.tool = tool;
         this.deadline = deadline;
+    }
+
+    // Шаблонная задача студии: без класса, статус проставит onCreate (DRAFT).
+    public Assignment(String title, AssignmentTool tool) {
+        this.title = title;
+        this.tool = tool;
     }
 }
