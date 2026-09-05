@@ -29,11 +29,17 @@ public class PortalStudentService {
 
     @Transactional
     public User findOrCreate(PortalSsoClaims claims) {
-        return userRepository.findByOrganization_IdAndExternalRef(ORG_ID, claims.externalRef())
+        return findOrCreate(claims.externalRef(), claims.fullName());
+    }
+
+    // externalRef — "lp-student-{N}". fullName может быть null (например,
+    // при зачислении на курс до первого захода ученика — §8.1).
+    @Transactional
+    public User findOrCreate(String externalRef, String fullName) {
+        return userRepository.findByOrganization_IdAndExternalRef(ORG_ID, externalRef)
             .map(user -> {
-                // Имя в кабинете могло измениться — подтягиваем актуальное.
-                if (claims.fullName() != null && !claims.fullName().equals(user.getFullName())) {
-                    user.setFullName(claims.fullName());
+                if (fullName != null && !fullName.isBlank() && !fullName.equals(user.getFullName())) {
+                    user.setFullName(fullName);
                 }
                 return user;
             })
@@ -41,9 +47,9 @@ public class PortalStudentService {
                 Organization org = organizationRepository.findById(ORG_ID)
                     .orElseGet(() -> organizationRepository.save(new Organization("PixelForge")));
 
-                User user = new User(org, claims.externalRef(), UserRole.STUDENT,
-                    claims.fullName() != null ? claims.fullName() : "Ученик");
-                user.setExternalRef(claims.externalRef());
+                User user = new User(org, externalRef, UserRole.STUDENT,
+                    fullName != null && !fullName.isBlank() ? fullName : "Ученик");
+                user.setExternalRef(externalRef);
                 return userRepository.save(user);
             });
     }

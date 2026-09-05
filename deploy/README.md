@@ -51,6 +51,8 @@ PixelForge реализует тот же контракт, что и други
 | Вход по SSO из кабинета | `GET /api/auth/sso?token=<JWT>` (HS256, `aud=pixelforge`) |
 | Прогресс ученика для тренера/методиста | `GET /api/internal/lms-progress/lp-student-{id}` (заголовок `X-LP-Signature`) |
 | Обратный пуш прогресса | `POST {PORTAL_BASE_URL}/api/v1/student-portal/progress-sync` (`X-Kodex-Signature`, `catalog_item_code=pixelforge`) |
+| Студия методиста (authoring) | `/api/admin/**` — HMAC `X-LP-Signature=hex(HMAC_SHA256(secret,"METHOD\npath\nts\nsha256(body)"))` + `X-LP-Timestamp` (±300с) |
+| Вебхук публикации курса | `POST {PORTAL_BASE_URL}/api/v1/pixelforge/courses/webhook` (`X-LP-Signature=hex(HMAC_SHA256(secret, raw_body))`) |
 
 Переменные окружения (`.env`):
 

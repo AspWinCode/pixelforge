@@ -1,10 +1,12 @@
 package studio.pixelforge.backend.course;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import studio.pixelforge.backend.organization.Organization;
 import studio.pixelforge.backend.organization.OrganizationRepository;
+import studio.pixelforge.backend.portal.CourseStatusChangedEvent;
 
 import java.util.List;
 
@@ -18,15 +20,24 @@ public class CourseService {
     private final CourseNodeRepository courseNodeRepository;
     private final NodeTaskRepository nodeTaskRepository;
     private final OrganizationRepository organizationRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public CourseService(CourseRepository courseRepository,
                           CourseNodeRepository courseNodeRepository,
                           NodeTaskRepository nodeTaskRepository,
-                          OrganizationRepository organizationRepository) {
+                          OrganizationRepository organizationRepository,
+                          ApplicationEventPublisher eventPublisher) {
         this.courseRepository = courseRepository;
         this.courseNodeRepository = courseNodeRepository;
         this.nodeTaskRepository = nodeTaskRepository;
         this.organizationRepository = organizationRepository;
+        this.eventPublisher = eventPublisher;
+    }
+
+    private void publishVisibility(Course course, String event) {
+        eventPublisher.publishEvent(new CourseStatusChangedEvent(
+            event, course.getId(), course.getSlug(), course.getTitle(),
+            course.getDescription(), course.getStatus().name()));
     }
 
     @Transactional(readOnly = true)
@@ -54,12 +65,17 @@ public class CourseService {
             course.setSortOrder(request.sortOrder());
         }
         course.setSlug(resolveSlug(request.slug(), request.title(), null));
-        return courseRepository.save(course);
+        Course saved = courseRepository.save(course);
+        if (saved.getStatus() == CourseStatus.PUBLISHED) {
+            publishVisibility(saved, "published");
+        }
+        return saved;
     }
 
     @Transactional
     public Course update(Long id, UpdateCourseRequest request) {
         Course course = getById(id);
+        CourseStatus before = course.getStatus();
         if (request.title() != null) {
             course.setTitle(request.title());
         }
@@ -78,29 +94,49 @@ public class CourseService {
             String basis = request.slug().isBlank() ? course.getTitle() : request.slug();
             course.setSlug(resolveSlug(request.slug().isBlank() ? null : request.slug(), basis, id));
         }
+        emitVisibilityChange(course, before, course.getStatus());
         return course;
     }
 
     @Transactional
     public void delete(Long id) {
         Course course = getById(id);
+        // Снимок до удаления — событие несёт его, строки уже не будет.
+        CourseStatusChangedEvent deleted = new CourseStatusChangedEvent(
+            "deleted", course.getId(), course.getSlug(), course.getTitle(),
+            course.getDescription(), course.getStatus().name());
         courseRepository.delete(course);
+        eventPublisher.publishEvent(deleted);
     }
 
     @Transactional
     public Course archive(Long id) {
         Course course = getById(id);
+        CourseStatus before = course.getStatus();
         course.setStatus(CourseStatus.ARCHIVED);
+        emitVisibilityChange(course, before, CourseStatus.ARCHIVED);
         return course;
     }
 
     @Transactional
     public Course unarchive(Long id) {
         Course course = getById(id);
+        CourseStatus before = course.getStatus();
         if (course.getStatus() == CourseStatus.ARCHIVED) {
             course.setStatus(CourseStatus.DRAFT);
         }
+        emitVisibilityChange(course, before, course.getStatus());
         return course;
+    }
+
+    // Витрина портала видит только PUBLISHED-курсы. Событие шлём только на
+    // смене видимости: стал PUBLISHED -> published; перестал -> unpublished.
+    private void emitVisibilityChange(Course course, CourseStatus before, CourseStatus after) {
+        if (before != CourseStatus.PUBLISHED && after == CourseStatus.PUBLISHED) {
+            publishVisibility(course, "published");
+        } else if (before == CourseStatus.PUBLISHED && after != CourseStatus.PUBLISHED) {
+            publishVisibility(course, "unpublished");
+        }
     }
 
     @Transactional(readOnly = true)

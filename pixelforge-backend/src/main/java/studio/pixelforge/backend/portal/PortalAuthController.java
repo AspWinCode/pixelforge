@@ -37,6 +37,7 @@ public class PortalAuthController {
 
     @GetMapping("/sso")
     public void sso(@RequestParam(value = "token", required = false) String token,
+                    @RequestParam(value = "course", required = false) Long course,
                     HttpServletRequest httpRequest,
                     HttpServletResponse httpResponse) throws IOException {
         if (token == null || token.isBlank()) {
@@ -49,7 +50,9 @@ public class PortalAuthController {
         httpRequest.getSession(true)
             .setAttribute(SessionAuthenticationFilter.SESSION_ATTRIBUTE, sessionUser);
 
-        // 302 на страницу пути ученика; токен в истории браузера больше не нужен.
-        httpResponse.sendRedirect(frontendOrigin + "/path");
+        // ?course=<id> — переход из витрины на конкретный курс; иначе общий
+        // путь ученика. Токен в истории браузера больше не нужен.
+        String target = course != null ? frontendOrigin + "/courses/" + course : frontendOrigin + "/path";
+        httpResponse.sendRedirect(target);
     }
 }
